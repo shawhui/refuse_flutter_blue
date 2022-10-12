@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:refuse_flutter_blue/refuse_flutter_blue.dart';
 
 class ScanResultTile extends StatelessWidget {
   const ScanResultTile({Key key, this.result, this.onTap}) : super(key: key);
@@ -121,7 +121,7 @@ class ScanResultTile extends StatelessWidget {
 }
 
 class ServiceTile extends StatelessWidget {
-  final BluetoothService service;
+  final RefuseBluetoothService service;
   final List<CharacteristicTile> characteristicTiles;
 
   const ServiceTile({Key key, this.service, this.characteristicTiles})
@@ -156,7 +156,7 @@ class ServiceTile extends StatelessWidget {
 }
 
 class CharacteristicTile extends StatelessWidget {
-  final BluetoothCharacteristic characteristic;
+  final RefuseBluetoothCharacteristic characteristic;
   final List<DescriptorTile> descriptorTiles;
   final VoidCallback onReadPressed;
   final VoidCallback onWritePressed;
@@ -227,7 +227,7 @@ class CharacteristicTile extends StatelessWidget {
 }
 
 class DescriptorTile extends StatelessWidget {
-  final BluetoothDescriptor descriptor;
+  final RefuseBluetoothDescriptor descriptor;
   final VoidCallback onReadPressed;
   final VoidCallback onWritePressed;
 

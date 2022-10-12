@@ -66,12 +66,12 @@ class RefuseFlutterBlue {
   }
 
   /// Retrieve a list of connected devices
-  Future<List<BluetoothDevice>> get connectedDevices {
+  Future<List<RefuseBluetoothDevice>> get connectedDevices {
     return _channel
         .invokeMethod('getConnectedDevices')
         .then((buffer) => protos.ConnectedDevicesResponse.fromBuffer(buffer))
         .then((p) => p.devices)
-        .then((p) => p.map((d) => BluetoothDevice.fromProto(d)).toList());
+        .then((p) => p.map((d) => RefuseBluetoothDevice.fromProto(d)).toList());
   }
 
   _setLogLevelIfAvailable() async {
@@ -89,8 +89,8 @@ class RefuseFlutterBlue {
   /// If scanning is already in progress, this will throw an [Exception].
   Stream<ScanResult> scan({
     ScanMode scanMode = ScanMode.lowLatency,
-    List<Guid> withServices = const [],
-    List<Guid> withDevices = const [],
+    List<RefuseGuid> withServices = const [],
+    List<RefuseGuid> withDevices = const [],
     Duration timeout,
     bool allowDuplicates = false,
   }) async* {
@@ -154,8 +154,8 @@ class RefuseFlutterBlue {
   /// or call [scan] instead.
   Future startScan({
     ScanMode scanMode = ScanMode.lowLatency,
-    List<Guid> withServices = const [],
-    List<Guid> withDevices = const [],
+    List<RefuseGuid> withServices = const [],
+    List<RefuseGuid> withDevices = const [],
     Duration timeout,
     bool allowDuplicates = false,
   }) async {
@@ -250,12 +250,12 @@ class ScanResult {
   const ScanResult({this.device, this.advertisementData, this.rssi});
 
   ScanResult.fromProto(protos.ScanResult p)
-      : device = new BluetoothDevice.fromProto(p.device),
+      : device = new RefuseBluetoothDevice.fromProto(p.device),
         advertisementData =
             new AdvertisementData.fromProto(p.advertisementData),
         rssi = p.rssi;
 
-  final BluetoothDevice device;
+  final RefuseBluetoothDevice device;
   final AdvertisementData advertisementData;
   final int rssi;
 

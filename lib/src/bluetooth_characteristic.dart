@@ -5,16 +5,16 @@
 part of refuse_flutter_blue;
 
 class RefuseBluetoothCharacteristic {
-  final Guid uuid;
+  final RefuseGuid uuid;
   final DeviceIdentifier deviceId;
-  final Guid serviceUuid;
-  final Guid secondaryServiceUuid;
+  final RefuseGuid serviceUuid;
+  final RefuseGuid secondaryServiceUuid;
   final CharacteristicProperties properties;
-  final List<BluetoothDescriptor> descriptors;
+  final List<RefuseBluetoothDescriptor> descriptors;
   bool get isNotifying {
     try {
       var cccd =
-          descriptors.singleWhere((d) => d.uuid == BluetoothDescriptor.cccd);
+          descriptors.singleWhere((d) => d.uuid == RefuseBluetoothDescriptor.cccd);
       return ((cccd.lastValue[0] & 0x01) > 0 || (cccd.lastValue[0] & 0x02) > 0);
     } catch (e) {
       return false;
@@ -29,21 +29,21 @@ class RefuseBluetoothCharacteristic {
 
   List<int> get lastValue => _value.value;
 
-  RefuseBluetoothCharacteristic.fromProto(protos.RefuseBluetoothCharacteristic p)
-      : uuid = new Guid(p.uuid),
+  RefuseBluetoothCharacteristic.fromProto(protos.BluetoothCharacteristic p)
+      : uuid = new RefuseGuid(p.uuid),
         deviceId = new DeviceIdentifier(p.remoteId),
-        serviceUuid = new Guid(p.serviceUuid),
+        serviceUuid = new RefuseGuid(p.serviceUuid),
         secondaryServiceUuid = (p.secondaryServiceUuid.length > 0)
-            ? new Guid(p.secondaryServiceUuid)
+            ? new RefuseGuid(p.secondaryServiceUuid)
             : null,
         descriptors = p.descriptors
-            .map((d) => new BluetoothDescriptor.fromProto(d))
+            .map((d) => new RefuseBluetoothDescriptor.fromProto(d))
             .toList(),
         properties = new CharacteristicProperties.fromProto(p.properties),
         _value = BehaviorSubject.seeded(p.value);
 
   Stream<RefuseBluetoothCharacteristic> get _onCharacteristicChangedStream =>
-      FlutterBlue.instance._methodStream
+      RefuseFlutterBlue.instance._methodStream
           .where((m) => m.method == "OnCharacteristicChanged")
           .map((m) => m.arguments)
           .map(
@@ -60,7 +60,7 @@ class RefuseBluetoothCharacteristic {
   Stream<List<int>> get _onValueChangedStream =>
       _onCharacteristicChangedStream.map((c) => c.lastValue);
 
-  void _updateDescriptors(List<BluetoothDescriptor> newDescriptors) {
+  void _updateDescriptors(List<RefuseBluetoothDescriptor> newDescriptors) {
     for (var d in descriptors) {
       for (var newD in newDescriptors) {
         if (d.uuid == newD.uuid) {
@@ -76,13 +76,13 @@ class RefuseBluetoothCharacteristic {
       ..remoteId = deviceId.toString()
       ..characteristicUuid = uuid.toString()
       ..serviceUuid = serviceUuid.toString();
-    FlutterBlue.instance._log(LogLevel.info,
+    RefuseFlutterBlue.instance._log(LogLevel.info,
         'remoteId: ${deviceId.toString()} characteristicUuid: ${uuid.toString()} serviceUuid: ${serviceUuid.toString()}');
 
-    await FlutterBlue.instance._channel
+    await RefuseFlutterBlue.instance._channel
         .invokeMethod('readCharacteristic', request.writeToBuffer());
 
-    return FlutterBlue.instance._methodStream
+    return RefuseFlutterBlue.instance._methodStream
         .where((m) => m.method == "ReadCharacteristicResponse")
         .map((m) => m.arguments)
         .map((buffer) =>
@@ -117,14 +117,14 @@ class RefuseBluetoothCharacteristic {
           protos.WriteCharacteristicRequest_WriteType.valueOf(type.index)
       ..value = value;
 
-    var result = await FlutterBlue.instance._channel
+    var result = await RefuseFlutterBlue.instance._channel
         .invokeMethod('writeCharacteristic', request.writeToBuffer());
 
     if (type == CharacteristicWriteType.withoutResponse) {
       return result;
     }
 
-    return FlutterBlue.instance._methodStream
+    return RefuseFlutterBlue.instance._methodStream
         .where((m) => m.method == "WriteCharacteristicResponse")
         .map((m) => m.arguments)
         .map((buffer) =>
@@ -149,10 +149,10 @@ class RefuseBluetoothCharacteristic {
       ..characteristicUuid = uuid.toString()
       ..enable = notify;
 
-    await FlutterBlue.instance._channel
+    await RefuseFlutterBlue.instance._channel
         .invokeMethod('setNotification', request.writeToBuffer());
 
-    return FlutterBlue.instance._methodStream
+    return RefuseFlutterBlue.instance._methodStream
         .where((m) => m.method == "SetNotificationResponse")
         .map((m) => m.arguments)
         .map((buffer) => new protos.SetNotificationResponse.fromBuffer(buffer))

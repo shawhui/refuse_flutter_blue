@@ -9,7 +9,7 @@ class RefuseBluetoothDevice {
   final String name;
   final RefuseBluetoothDeviceType type;
 
-  RefuseBluetoothDevice.fromProto(protos.RefuseBluetoothDevice p)
+  RefuseBluetoothDevice.fromProto(protos.BluetoothDevice p)
       : id = new DeviceIdentifier(p.remoteId),
         name = p.name,
         type = RefuseBluetoothDeviceType.values[p.type.value];
@@ -34,7 +34,7 @@ class RefuseBluetoothDevice {
       });
     }
 
-    await FlutterBlue.instance._channel
+    await RefuseFlutterBlue.instance._channel
         .invokeMethod('connect', request.writeToBuffer());
 
     await state.firstWhere((s) => s == RefuseBluetoothDeviceState.connected);
@@ -46,25 +46,25 @@ class RefuseBluetoothDevice {
 
   /// Cancels connection to the Bluetooth Device
   Future disconnect() =>
-      FlutterBlue.instance._channel.invokeMethod('disconnect', id.toString());
+      RefuseFlutterBlue.instance._channel.invokeMethod('disconnect', id.toString());
 
-  BehaviorSubject<List<BluetoothService>> _services =
+  BehaviorSubject<List<RefuseBluetoothService>> _services =
       BehaviorSubject.seeded([]);
 
   /// Discovers services offered by the remote device as well as their characteristics and descriptors
-  Future<List<BluetoothService>> discoverServices() async {
+  Future<List<RefuseBluetoothService>> discoverServices() async {
     final s = await state.first;
     if (s != RefuseBluetoothDeviceState.connected) {
       return Future.error(new Exception(
           'Cannot discoverServices while device is not connected. State == $s'));
     }
-    var response = FlutterBlue.instance._methodStream
+    var response = RefuseFlutterBlue.instance._methodStream
         .where((m) => m.method == "DiscoverServicesResult")
         .map((m) => m.arguments)
         .map((buffer) => new protos.DiscoverServicesResult.fromBuffer(buffer))
         .where((p) => p.remoteId == id.toString())
         .map((p) => p.services)
-        .map((s) => s.map((p) => new BluetoothService.fromProto(p)).toList())
+        .map((s) => s.map((p) => new RefuseBluetoothService.fromProto(p)).toList())
         .first
         .then((list) {
       _services.add(list);
@@ -72,7 +72,7 @@ class RefuseBluetoothDevice {
       return list;
     });
 
-    await FlutterBlue.instance._channel
+    await RefuseFlutterBlue.instance._channel
         .invokeMethod('discoverServices', id.toString());
 
     _isDiscoveringServices.add(true);
@@ -82,23 +82,23 @@ class RefuseBluetoothDevice {
 
   /// Returns a list of Bluetooth GATT services offered by the remote device
   /// This function requires that discoverServices has been completed for this device
-  Stream<List<BluetoothService>> get services async* {
-    yield await FlutterBlue.instance._channel
+  Stream<List<RefuseBluetoothService>> get services async* {
+    yield await RefuseFlutterBlue.instance._channel
         .invokeMethod('services', id.toString())
         .then((buffer) =>
             new protos.DiscoverServicesResult.fromBuffer(buffer).services)
-        .then((i) => i.map((s) => new BluetoothService.fromProto(s)).toList());
+        .then((i) => i.map((s) => new RefuseBluetoothService.fromProto(s)).toList());
     yield* _services.stream;
   }
 
   /// The current connection state of the device
   Stream<RefuseBluetoothDeviceState> get state async* {
-    yield await FlutterBlue.instance._channel
+    yield await RefuseFlutterBlue.instance._channel
         .invokeMethod('deviceState', id.toString())
         .then((buffer) => new protos.DeviceStateResponse.fromBuffer(buffer))
         .then((p) => RefuseBluetoothDeviceState.values[p.state.value]);
 
-    yield* FlutterBlue.instance._methodStream
+    yield* RefuseFlutterBlue.instance._methodStream
         .where((m) => m.method == "DeviceState")
         .map((m) => m.arguments)
         .map((buffer) => new protos.DeviceStateResponse.fromBuffer(buffer))
@@ -108,12 +108,12 @@ class RefuseBluetoothDevice {
 
   /// The MTU size in bytes
   Stream<int> get mtu async* {
-    yield await FlutterBlue.instance._channel
+    yield await RefuseFlutterBlue.instance._channel
         .invokeMethod('mtu', id.toString())
         .then((buffer) => new protos.MtuSizeResponse.fromBuffer(buffer))
         .then((p) => p.mtu);
 
-    yield* FlutterBlue.instance._methodStream
+    yield* RefuseFlutterBlue.instance._methodStream
         .where((m) => m.method == "MtuSize")
         .map((m) => m.arguments)
         .map((buffer) => new protos.MtuSizeResponse.fromBuffer(buffer))
@@ -128,7 +128,7 @@ class RefuseBluetoothDevice {
       ..remoteId = id.toString()
       ..mtu = desiredMtu;
 
-    return FlutterBlue.instance._channel
+    return RefuseFlutterBlue.instance._channel
         .invokeMethod('requestMtu', request.writeToBuffer());
   }
 

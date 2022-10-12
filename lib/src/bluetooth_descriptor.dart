@@ -5,23 +5,23 @@
 part of refuse_flutter_blue;
 
 class RefuseBluetoothDescriptor {
-  static final Guid cccd = new Guid("00002902-0000-1000-8000-00805f9b34fb");
+  static final RefuseGuid cccd = new RefuseGuid("00002902-0000-1000-8000-00805f9b34fb");
 
-  final Guid uuid;
+  final RefuseGuid uuid;
   final DeviceIdentifier deviceId;
-  final Guid serviceUuid;
-  final Guid characteristicUuid;
+  final RefuseGuid serviceUuid;
+  final RefuseGuid characteristicUuid;
 
   BehaviorSubject<List<int>> _value;
   Stream<List<int>> get value => _value.stream;
 
   List<int> get lastValue => _value.value;
 
-  RefuseBluetoothDescriptor.fromProto(protos.RefuseBluetoothDescriptor p)
-      : uuid = new Guid(p.uuid),
+  RefuseBluetoothDescriptor.fromProto(protos.BluetoothDescriptor p)
+      : uuid = new RefuseGuid(p.uuid),
         deviceId = new DeviceIdentifier(p.remoteId),
-        serviceUuid = new Guid(p.serviceUuid),
-        characteristicUuid = new Guid(p.characteristicUuid),
+        serviceUuid = new RefuseGuid(p.serviceUuid),
+        characteristicUuid = new RefuseGuid(p.characteristicUuid),
         _value = BehaviorSubject.seeded(p.value);
 
   /// Retrieves the value of a specified descriptor
@@ -32,10 +32,10 @@ class RefuseBluetoothDescriptor {
       ..characteristicUuid = characteristicUuid.toString()
       ..serviceUuid = serviceUuid.toString();
 
-    await FlutterBlue.instance._channel
+    await RefuseFlutterBlue.instance._channel
         .invokeMethod('readDescriptor', request.writeToBuffer());
 
-    return FlutterBlue.instance._methodStream
+    return RefuseFlutterBlue.instance._methodStream
         .where((m) => m.method == "ReadDescriptorResponse")
         .map((m) => m.arguments)
         .map((buffer) => new protos.ReadDescriptorResponse.fromBuffer(buffer))
@@ -61,10 +61,10 @@ class RefuseBluetoothDescriptor {
       ..serviceUuid = serviceUuid.toString()
       ..value = value;
 
-    await FlutterBlue.instance._channel
+    await RefuseFlutterBlue.instance._channel
         .invokeMethod('writeDescriptor', request.writeToBuffer());
 
-    return FlutterBlue.instance._methodStream
+    return RefuseFlutterBlue.instance._methodStream
         .where((m) => m.method == "WriteDescriptorResponse")
         .map((m) => m.arguments)
         .map((buffer) => new protos.WriteDescriptorResponse.fromBuffer(buffer))

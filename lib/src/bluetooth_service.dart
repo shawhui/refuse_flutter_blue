@@ -5,18 +5,18 @@
 part of refuse_flutter_blue;
 
 class RefuseBluetoothService {
-  final Guid uuid;
+  final RefuseGuid uuid;
   final DeviceIdentifier deviceId;
   final bool isPrimary;
-  final List<BluetoothCharacteristic> characteristics;
+  final List<RefuseBluetoothCharacteristic> characteristics;
   final List<RefuseBluetoothService> includedServices;
 
-  RefuseBluetoothService.fromProto(protos.RefuseBluetoothService p)
-      : uuid = new Guid(p.uuid),
+  RefuseBluetoothService.fromProto(protos.BluetoothService p)
+      : uuid = new RefuseGuid(p.uuid),
         deviceId = new DeviceIdentifier(p.remoteId),
         isPrimary = p.isPrimary,
         characteristics = p.characteristics
-            .map((c) => new BluetoothCharacteristic.fromProto(c))
+            .map((c) => new RefuseBluetoothCharacteristic.fromProto(c))
             .toList(),
         includedServices = p.includedServices
             .map((s) => new RefuseBluetoothService.fromProto(s))

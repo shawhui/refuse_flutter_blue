@@ -6,20 +6,23 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
-import 'package:flutter_blue_example/widgets.dart';
+import 'package:refuse_flutter_blue/refuse_flutter_blue.dart';
+import 'package:refuse_flutter_blue_example/widgets.dart';
+
 
 void main() {
-  runApp(FlutterBlueApp());
+  runApp(RefuseFlutterBlueApp());
 }
 
-class FlutterBlueApp extends StatelessWidget {
+class RefuseFlutterBlueApp extends StatelessWidget {
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       color: Colors.lightBlue,
       home: StreamBuilder<BluetoothState>(
-          stream: FlutterBlue.instance.state,
+          stream: RefuseFlutterBlue.instance.state,
           initialData: BluetoothState.unknown,
           builder: (c, snapshot) {
             final state = snapshot.data;
@@ -73,25 +76,25 @@ class FindDevicesScreen extends StatelessWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () =>
-            FlutterBlue.instance.startScan(timeout: Duration(seconds: 4)),
+            RefuseFlutterBlue.instance.startScan(timeout: Duration(seconds: 4)),
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              StreamBuilder<List<BluetoothDevice>>(
+              StreamBuilder<List<RefuseBluetoothDevice>>(
                 stream: Stream.periodic(Duration(seconds: 2))
-                    .asyncMap((_) => FlutterBlue.instance.connectedDevices),
+                    .asyncMap((_) => RefuseFlutterBlue.instance.connectedDevices),
                 initialData: [],
                 builder: (c, snapshot) => Column(
                   children: snapshot.data
                       .map((d) => ListTile(
                             title: Text(d.name),
                             subtitle: Text(d.id.toString()),
-                            trailing: StreamBuilder<BluetoothDeviceState>(
+                            trailing: StreamBuilder<RefuseBluetoothDeviceState>(
                               stream: d.state,
-                              initialData: BluetoothDeviceState.disconnected,
+                              initialData: RefuseBluetoothDeviceState.disconnected,
                               builder: (c, snapshot) {
                                 if (snapshot.data ==
-                                    BluetoothDeviceState.connected) {
+                                    RefuseBluetoothDeviceState.connected) {
                                   return RaisedButton(
                                     child: Text('OPEN'),
                                     onPressed: () => Navigator.of(context).push(
@@ -108,7 +111,7 @@ class FindDevicesScreen extends StatelessWidget {
                 ),
               ),
               StreamBuilder<List<ScanResult>>(
-                stream: FlutterBlue.instance.scanResults,
+                stream: RefuseFlutterBlue.instance.scanResults,
                 initialData: [],
                 builder: (c, snapshot) => Column(
                   children: snapshot.data
@@ -130,19 +133,19 @@ class FindDevicesScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: StreamBuilder<bool>(
-        stream: FlutterBlue.instance.isScanning,
+        stream: RefuseFlutterBlue.instance.isScanning,
         initialData: false,
         builder: (c, snapshot) {
           if (snapshot.data) {
             return FloatingActionButton(
               child: Icon(Icons.stop),
-              onPressed: () => FlutterBlue.instance.stopScan(),
+              onPressed: () => RefuseFlutterBlue.instance.stopScan(),
               backgroundColor: Colors.red,
             );
           } else {
             return FloatingActionButton(
                 child: Icon(Icons.search),
-                onPressed: () => FlutterBlue.instance
+                onPressed: () => RefuseFlutterBlue.instance
                     .startScan(timeout: Duration(seconds: 4)));
           }
         },
@@ -154,9 +157,11 @@ class FindDevicesScreen extends StatelessWidget {
 class DeviceScreen extends StatelessWidget {
   const DeviceScreen({Key key, this.device}) : super(key: key);
 
-  final BluetoothDevice device;
+  final RefuseBluetoothDevice device;
+
 
   List<int> _getRandomBytes() {
+
     final math = Random();
     return [
       math.nextInt(255),
@@ -166,7 +171,7 @@ class DeviceScreen extends StatelessWidget {
     ];
   }
 
-  List<Widget> _buildServiceTiles(List<BluetoothService> services) {
+  List<Widget> _buildServiceTiles(List<RefuseBluetoothService> services) {
     return services
         .map(
           (s) => ServiceTile(
@@ -207,18 +212,18 @@ class DeviceScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(device.name),
         actions: <Widget>[
-          StreamBuilder<BluetoothDeviceState>(
+          StreamBuilder<RefuseBluetoothDeviceState>(
             stream: device.state,
-            initialData: BluetoothDeviceState.connecting,
+            initialData: RefuseBluetoothDeviceState.connecting,
             builder: (c, snapshot) {
               VoidCallback onPressed;
               String text;
               switch (snapshot.data) {
-                case BluetoothDeviceState.connected:
+                case RefuseBluetoothDeviceState.connected:
                   onPressed = () => device.disconnect();
                   text = 'DISCONNECT';
                   break;
-                case BluetoothDeviceState.disconnected:
+                case RefuseBluetoothDeviceState.disconnected:
                   onPressed = () => device.connect();
                   text = 'CONNECT';
                   break;
@@ -243,11 +248,11 @@ class DeviceScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            StreamBuilder<BluetoothDeviceState>(
+            StreamBuilder<RefuseBluetoothDeviceState>(
               stream: device.state,
-              initialData: BluetoothDeviceState.connecting,
+              initialData: RefuseBluetoothDeviceState.connecting,
               builder: (c, snapshot) => ListTile(
-                leading: (snapshot.data == BluetoothDeviceState.connected)
+                leading: (snapshot.data == RefuseBluetoothDeviceState.connected)
                     ? Icon(Icons.bluetooth_connected)
                     : Icon(Icons.bluetooth_disabled),
                 title: Text(
@@ -290,7 +295,7 @@ class DeviceScreen extends StatelessWidget {
                 ),
               ),
             ),
-            StreamBuilder<List<BluetoothService>>(
+            StreamBuilder<List<RefuseBluetoothService>>(
               stream: device.services,
               initialData: [],
               builder: (c, snapshot) {
