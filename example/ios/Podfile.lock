@@ -2,18 +2,18 @@ PODS:
   - e2e (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - flutter_blue (0.0.1):
+  - Protobuf (3.11.4)
+  - refuse_flutter_blue (0.0.1):
     - Flutter
-    - flutter_blue/Protos (= 0.0.1)
-  - flutter_blue/Protos (0.0.1):
+    - refuse_flutter_blue/Protos (= 0.0.1)
+  - refuse_flutter_blue/Protos (0.0.1):
     - Flutter
     - Protobuf (~> 3.11.4)
-  - Protobuf (3.11.4)
 
 DEPENDENCIES:
   - e2e (from `.symlinks/plugins/e2e/ios`)
   - Flutter (from `Flutter`)
-  - flutter_blue (from `.symlinks/plugins/flutter_blue/ios`)
+  - refuse_flutter_blue (from `.symlinks/plugins/refuse_flutter_blue/ios`)
 
 SPEC REPOS:
   trunk:
@@ -24,15 +24,15 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/e2e/ios"
   Flutter:
     :path: Flutter
-  flutter_blue:
-    :path: ".symlinks/plugins/flutter_blue/ios"
+  refuse_flutter_blue:
+    :path: ".symlinks/plugins/refuse_flutter_blue/ios"
 
 SPEC CHECKSUMS:
   e2e: 967b9b1fc533b7636a3b7a719f840c27f301fe1f
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_blue: eeb381dc4727a0954dede73515f683865494b370
   Protobuf: 176220c526ad8bd09ab1fb40a978eac3fef665f7
+  refuse_flutter_blue: e1e9cf8e7bd40b51ea50e6e42d949c97ad96ab87
 
 PODFILE CHECKSUM: 3dbe063e9c90a5d7c9e4e76e70a821b9e2c1d271
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.11.3
