@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 #import "RefuseFlutterBluePlugin.h"
-#import "Flutterblue.pbobjc.h"
+#import "RefuseFlutterblue.pbobjc.h"
 
 @interface CBUUID (CBUUIDAdditionsFlutterBlue)
 - (NSString *)fullUUIDString;
